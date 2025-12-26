@@ -1,0 +1,16 @@
+{
+    "name": "snap",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "node scripts/generate-icons.js && vite build",
+        "icons": "node scripts/generate-icons.js",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "sharp": "^0.34.5",
+        "vite": "^6.0.0"
+    }
+}
