@@ -47,6 +47,7 @@ async function handleGridClick(e) {
 
 async function copyImage(id) {
     const item = screenshots.find(d => d.id === id)
+    if (!item) return
     try {
         const blob = await fetch(item.dataUrl).then(r => r.blob())
         await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })])
@@ -57,6 +58,7 @@ async function copyImage(id) {
 
 async function downloadImage(id, label) {
     const item = screenshots.find(d => d.id === id)
+    if (!item) return
     // Convert data URL to blob for reliable download
     const response = await fetch(item.dataUrl)
     const blob = await response.blob()

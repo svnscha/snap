@@ -46,7 +46,7 @@ async function captureAll(tabId, resolutionIds) {
     return { success: true, count: screenshots.length }
   } catch (err) {
     // Try to restore window
-    await resizeWindow(originalSize.width, originalSize.height).catch(() => { })
+    await resizeWindow(originalSize.width, originalSize.height).catch(e => console.warn('Failed to restore window:', e))
     return { success: false, error: err.message }
   }
 }
