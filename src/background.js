@@ -9,9 +9,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 async function captureAll(tabId, resolutionIds) {
   const screenshots = []
-  const originalSize = await getWindowSize()
+  const win = await chrome.windows.getCurrent()
+  const originalSize = { width: win.width, height: win.height }
+  const wasMaximized = win.state === 'maximized'
 
   try {
+    // Unmaximize first - maximized windows ignore resize requests
+    if (wasMaximized) {
+      await chrome.windows.update(win.id, { state: 'normal' })
+      await delay(300)
+    }
+
     for (const id of resolutionIds) {
       const res = RESOLUTIONS[id]
 
@@ -37,8 +45,11 @@ async function captureAll(tabId, resolutionIds) {
       await delay(600)
     }
 
-    // Restore original size
+    // Restore original size and state
     await resizeWindow(originalSize.width, originalSize.height)
+    if (wasMaximized) {
+      await chrome.windows.update(win.id, { state: 'maximized' })
+    }
 
     // Open results gallery
     await openGallery(screenshots)
@@ -47,6 +58,9 @@ async function captureAll(tabId, resolutionIds) {
   } catch (err) {
     // Try to restore window
     await resizeWindow(originalSize.width, originalSize.height).catch(e => console.warn('Failed to restore window:', e))
+    if (wasMaximized) {
+      await chrome.windows.update(win.id, { state: 'maximized' }).catch(() => { })
+    }
     return { success: false, error: err.message }
   }
 }
